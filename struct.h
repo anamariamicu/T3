@@ -16,6 +16,7 @@ struct movie {
   void add_rating(int rating);
   void remove_rating(int rating);
   std::string get_rating();
+  int get_year();
 };
 
 struct user {
@@ -41,4 +42,20 @@ struct actor {
   int career_timestamp();
 };
 
+struct director {
+	std::string name;
+	unsigned int number_actors;
+
+	director(std::string name, unsigned int number_actors);
+};
+
+struct ratings {
+	int number_ratings;
+	int total_rating;
+
+	ratings();
+	ratings(int rating);
+	void add_rating(int rating);
+	double get_average_rating();
+};
 #endif

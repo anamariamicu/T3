@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <cmath>
+#include <time.h>
 
 #include "struct.h"
 
@@ -38,6 +39,12 @@ std::string movie::get_rating() {
 	std::string average_rating_string = std::to_string(average_rating);
 	average_rating_string.resize(average_rating_string.size() - 4);
 	return average_rating_string;
+}
+
+int movie::get_year() {
+	time_t time = timestamp;
+	struct tm *ptm = gmtime(&time);
+	return ptm->tm_year + 1900;
 }
 
 user::user(std::string name, std::string id) {
@@ -93,4 +100,31 @@ void actor::add_movie(struct movie *new_movie) {
 			last_movie = new_movie;
 		}
 	}
+}
+
+director::director(std::string name, unsigned int number_actors) {
+	this->name = name;
+	this->number_actors = number_actors;
+}
+
+ratings::ratings() {
+	number_ratings = 0;
+	total_rating = 0;
+}
+
+ratings::ratings(int rating) {
+	number_ratings = 1;
+	total_rating = rating;
+}
+
+void ratings::add_rating(int rating) {
+	++number_ratings;
+	total_rating += rating;
+}
+
+double ratings::get_average_rating() {
+	if (total_rating == 0) {
+		return 0;
+	}
+	return (double) total_rating / number_ratings;
 }

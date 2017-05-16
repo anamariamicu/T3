@@ -41,6 +41,7 @@ public:
 
     void add_user(std::string user_id, std::string name);
     void add_actor(std::string actor_id, std::string name);
+    void add_director(std::string name, unsigned int number_actors);
 
     void add_rating(std::string user_id, std::string movie_id, int rating);
     void update_rating(std::string user_id, std::string movie_id, int rating);
@@ -65,8 +66,12 @@ private:
     std::unordered_map<std::string, struct movie> movies;
     std::unordered_map<std::string, struct user> users;
     std::unordered_map<std::string, struct actor> actors;
-    std::vector<std::string> movie_ids;
-    std::vector<std::string> actor_ids;
+    std::unordered_map<std::string, struct director> directors;
+    std::unordered_map<std::string, std::vector<struct movie *>> categories;
+    std::vector<std::string> movie_ids; // ?
+    std::vector<std::string> actor_ids; // ?
+    struct director *most_influential_director;
+    struct actor *longest_career_actor;
 };
 
 #endif
