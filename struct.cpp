@@ -2,6 +2,8 @@
 #include <vector>
 #include <list>
 #include <unordered_map>
+#include <iostream>
+#include <cmath>
 
 #include "struct.h"
 
@@ -22,17 +24,73 @@ void movie::add_rating(int rating) {
 	total_rating += rating;
 }
 
+void movie::remove_rating(int rating) {
+	--number_ratings;
+	total_rating -= rating;
+}
+
+std::string movie::get_rating() {
+	if (number_ratings == 0) {
+		return "none";
+	}
+	double average_rating = (double) total_rating / number_ratings;
+	average_rating = roundf(average_rating * 100) / 100;
+	std::string average_rating_string = std::to_string(average_rating);
+	average_rating_string.resize(average_rating_string.size() - 4);
+	return average_rating_string;
+}
+
 user::user(std::string name, std::string id) {
 	this->name = name;
 	this->id = id;
 }
 
 void user::add_rating(std::string movie_id, int rating) {
-	this->ratings.insert(std::make_pair(movie_id, rating));
+	ratings.insert(std::make_pair(movie_id, rating));
+}
+
+int user::remove_rating(std::string movie_id) {
+	auto rating_removed = ratings.find(movie_id);
+	int rating;
+	if (rating_removed != ratings.end()) {
+		rating = rating_removed->second;
+		ratings.erase(movie_id);
+		return rating;
+	}
+	return 0;
 }
 
 actor::actor(std::string name, std::string id) {
 	this->name = name;
 	this->id = id;
+	first_movie = nullptr;
+	last_movie = nullptr;
+	on_site = true;
 }
 
+actor::actor(std::string id) {
+	this->id = id;
+	first_movie = nullptr;
+	last_movie = nullptr;
+	on_site = false;
+}
+
+int actor::career_timestamp() {
+	if (first_movie == nullptr) {
+		return 0;
+	}
+	return last_movie->timestamp - first_movie->timestamp;
+}
+
+void actor::add_movie(struct movie *new_movie) {
+	if (first_movie == nullptr) {
+		first_movie = new_movie;
+		last_movie = new_movie;
+	} else {
+		if (new_movie->timestamp < first_movie->timestamp) {
+			first_movie = new_movie;
+		} else if (new_movie->timestamp > last_movie->timestamp) {
+			last_movie = new_movie;
+		}
+	}
+}

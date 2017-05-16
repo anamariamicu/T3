@@ -65,6 +65,8 @@ private:
     std::unordered_map<std::string, struct movie> movies;
     std::unordered_map<std::string, struct user> users;
     std::unordered_map<std::string, struct actor> actors;
+    std::vector<std::string> movie_ids;
+    std::vector<std::string> actor_ids;
 };
 
 #endif
