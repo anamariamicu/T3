@@ -67,19 +67,17 @@ int user::remove_rating(std::string movie_id) {
 	return 0;
 }
 
-actor::actor(std::string name, std::string id) {
+actor::actor(std::string id, std::string name) {
 	this->name = name;
 	this->id = id;
 	first_movie = nullptr;
 	last_movie = nullptr;
-	on_site = true;
 }
 
 actor::actor(std::string id) {
 	this->id = id;
 	first_movie = nullptr;
 	last_movie = nullptr;
-	on_site = false;
 }
 
 int actor::career_timestamp() {

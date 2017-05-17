@@ -34,7 +34,6 @@ struct actor {
   std::string id;
   struct movie *first_movie;
   struct movie *last_movie;
-  bool on_site;
 
   actor(std::string name, std::string id);
   actor(std::string id);

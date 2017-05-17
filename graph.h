@@ -39,7 +39,10 @@ class Graph {
   void addEdge(T src, T dst) {
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
     struct data<T, int> aux(dst, 0);
-    neighbors->push_back(aux);
+    if (neighbors != nullptr) {
+      neighbors->push_back(aux);
+    }
+      
   }
 
   void addEdge(T src, T dst, int dist) {
@@ -117,6 +120,15 @@ class Graph {
   bool hasEdges() {
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
       if (getNeighbors(it->nodeValue)->isEmpty() == false) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool hasNode(T node) {
+    for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+      if (it->nodeValue == node) {
         return true;
       }
     }
