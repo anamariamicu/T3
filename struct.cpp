@@ -6,7 +6,7 @@
 #include <cmath>
 #include <time.h>
 
-#include "struct.h"
+#include "include/struct.h"
 
 movie::movie(std::string name, std::string id, int timestamp, std::vector<std::string> categories,
   	         std::string director, std::vector<std::string> actor_ids) {
@@ -82,12 +82,12 @@ actor::actor(std::string id) {
 
 int actor::career_timestamp() {
 	if (first_movie == nullptr) {
-		return 0;
+		return -1;
 	}
 	return last_movie->timestamp - first_movie->timestamp;
 }
 
-void actor::add_movie(struct movie *new_movie) {
+void actor::add_movie(struct movie *new_movie, struct actor **longest_career_actor) {
 	if (first_movie == nullptr) {
 		first_movie = new_movie;
 		last_movie = new_movie;
@@ -98,6 +98,13 @@ void actor::add_movie(struct movie *new_movie) {
 			last_movie = new_movie;
 		}
 	}
+	if (*longest_career_actor == nullptr ||
+	    (career_timestamp() > (*longest_career_actor)->career_timestamp()) ||
+	    (career_timestamp() == (*longest_career_actor)->career_timestamp() &&
+	    	id < (*longest_career_actor)->id)) {
+	    	*longest_career_actor = this;
+		std::cout <<(*longest_career_actor)->id << " acum\n";
+	 }
 }
 
 director::director(std::string name, unsigned int number_actors) {

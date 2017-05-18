@@ -1,7 +1,7 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-#include<iostream>
+#include <iostream>
  
 template <typename T>
 class Heap
@@ -32,6 +32,8 @@ public:
     T extractMin();
 
     void displayVect();
+
+    bool isEmpty();
 };
 
 
@@ -157,10 +159,12 @@ T Heap<T>::extractMin()
     --dimVect;
     if (dimVect < capVect / 2) {
       capVect = capVect / 2;
-      T *newValues = new T[capVect];
-      std::memcpy(newValues, values, dimVect * sizeof(T));
-      delete[] values;
-      values = newValues;
+      if (capVect != 0) {
+        T *newValues = new T[capVect];
+        std::memcpy(newValues, values, dimVect * sizeof(T));
+        delete[] values;
+        values = newValues;
+      }
     }
     pushDown(0);
     return aux;
@@ -174,4 +178,12 @@ void Heap<T>::displayVect()
     }
 }
 
+template <typename T>
+bool Heap<T>::isEmpty()
+{
+    if (dimVect == 0) {
+        return true;
+    }
+    return false;
+}
 #endif // HEAP_H
