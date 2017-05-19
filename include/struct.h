@@ -1,6 +1,21 @@
 #ifndef __STRUCT_H__
 #define __STRUCT_H__
 
+class recent_movies {
+public:
+	std::string movie_id;
+	int timestamp;
+
+	friend bool operator>(const recent_movies& X, const recent_movies &Y);
+    friend bool operator<(const recent_movies& X, const recent_movies &Y);
+
+    recent_movies();
+    recent_movies(std::string movie_id, int timestamp);
+    ~recent_movies(){
+
+    }
+};
+
 struct movie {
   std::string name;
   std::string id;

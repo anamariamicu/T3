@@ -8,6 +8,16 @@
 
 #include "include/struct.h"
 
+bool operator>(const recent_movies& X, const recent_movies &Y)
+{
+  return (X.timestamp > Y.timestamp);
+}
+
+bool operator<(const recent_movies& X, const recent_movies &Y)
+{
+  return (X.timestamp < Y.timestamp);
+}
+
 movie::movie(std::string name, std::string id, int timestamp, std::vector<std::string> categories,
   	         std::string director, std::vector<std::string> actor_ids) {
 	this->name = name;
@@ -103,7 +113,6 @@ void actor::add_movie(struct movie *new_movie, struct actor **longest_career_act
 	    (career_timestamp() == (*longest_career_actor)->career_timestamp() &&
 	    	id < (*longest_career_actor)->id)) {
 	    	*longest_career_actor = this;
-		std::cout <<(*longest_career_actor)->id << " acum\n";
 	 }
 }
 
@@ -132,4 +141,13 @@ double ratings::get_average_rating() {
 		return 0;
 	}
 	return (double) total_rating / number_ratings;
+}
+
+recent_movies::recent_movies(std::string movie_id, int timestamp) {
+	this->movie_id = movie_id;
+	this->timestamp = timestamp;
+}
+recent_movies::recent_movies() {
+	this->movie_id = -1;
+	this->timestamp = -1;
 }

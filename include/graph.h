@@ -15,8 +15,8 @@ class Graph {
  public:
   void addNode(T node) {
     struct Node<T> n(node);
-		nodes.push_back(n);
-	}
+    nodes.push_back(n);
+  }
 
   void removeNode(T node) {
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -41,8 +41,7 @@ class Graph {
     struct data<T, int> aux(dst, 0);
     if (neighbors != nullptr) {
       neighbors->push_back(aux);
-    }
-      
+    } 
   }
 
   void addEdge(T src, T dst, int dist) {
@@ -100,6 +99,9 @@ class Graph {
 
   bool hasEdge(T src, T dst) {
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
+    if (neighbors == nullptr) {
+        return false;
+    }
     for (auto it = neighbors->begin(); it != neighbors->end(); ++it) {
       if (it->key == dst) {
         return true;

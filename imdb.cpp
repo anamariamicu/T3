@@ -9,9 +9,11 @@
 #include "include/graph.h"
 #include "include/struct.h"
 #include "include/imdb.h"
+#include "include/heap.h"
 
 
-IMDb::IMDb() {
+IMDb::IMDb()
+	: most_recent_movies(100) {
 	most_influential_director = nullptr;
 	longest_career_actor = nullptr;
 }
@@ -26,24 +28,35 @@ void IMDb::add_movie(std::string movie_name,
     struct movie new_movie(movie_name, movie_id, timestamp, categories,
                            director_name, actor_ids);
     movies.insert(std::make_pair(movie_id, new_movie));
-    this->movie_ids.push_back(movie_id); // ?
-    struct movie *movie_searched;
+   // this->movie_ids.push_back(movie_id); // ?
+    struct movie *movie_searched = &(movies.find(movie_id)->second);
+int contor = 0;
     for (auto it = actor_ids.begin(); it != actor_ids.end(); ++it) {
-		movie_searched = &(movies.find(movie_id)->second);
         	actors.find(*it)->second.add_movie(movie_searched, &longest_career_actor);
 
         /// colleagues
 	if (colleagues.hasNode(*it) == false) {
-        	colleagues.addNode(*it);
+		colleagues.addNode(*it);
 	}
-        for (auto it2 = actor_ids.begin(); it2 != actor_ids.end() && *it2 != *it; ++it2) {
+contor++;
+/*        for (auto it2 = actor_ids.begin(); it2 != actor_ids.end() && *it2 != *it; ++it2) {
 		if (colleagues.hasEdge(*it, *it2) == false) { // un if in plus?
         		colleagues.addEdge(*it, *it2);
 		}
 		if (colleagues.hasEdge(*it2, *it) == false) {
         		colleagues.addEdge(*it2, *it);
 		}
-        }
+        } */
+	for (auto it2 = actor_ids.begin() + contor; it2 != actor_ids.end() && *it2 != *it; ++it2) {
+		if (colleagues.hasNode(*it2) == false) {
+			colleagues.addNode(*it2);
+		}
+		if (colleagues.hasEdge(*it, *it2) == false) {
+
+			colleagues.addEdge(*it, *it2);
+			colleagues.addEdge(*it2, *it);
+		}
+	}
     }
     add_director(director_name, actor_ids.size());
 	for (auto it = categories.begin(); it!= categories.end(); ++ it){
@@ -55,7 +68,10 @@ void IMDb::add_movie(std::string movie_name,
 		} else {
 			category_searched->second.push_back(movie_searched);
 		}
-	}    
+	}  
+	/// top k most recent movies
+	recent_movies new_recent_movie(movie_id, timestamp);
+	most_recent_movies.insert(new_recent_movie);  
 }
 
 void IMDb::add_user(std::string user_id, std::string name) {
@@ -170,18 +186,22 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
     std::string result = "";
     std::list<struct data<std::string, int>> *first_colleagues;
     first_colleagues = colleagues.getNeighbors(actor_id);
+    if (actor_id == "5dce0979-5db2-4e9b-816d-548041e23400") {
+	for (auto it = first_colleagues->begin(); it != first_colleagues->end(); ++it) {
+}}
     if (first_colleagues == nullptr) {
         return "none";
     }
     for (auto it = first_colleagues->begin(); it != first_colleagues->end(); ++it) {
     	std::list<struct data<std::string, int>> *second_colleagues;
     	second_colleagues = colleagues.getNeighbors(it->key);
-        if (second_colleagues == nullptr) {
-            continue;
-        }
       	for (auto it2 = second_colleagues->begin(); it2 != second_colleagues->end(); ++it2) {
     		if (actor_id != it2->key && colleagues.hasEdge(actor_id, it2->key) == false) {
-			 all_second_colleagues.push_back(it2->key);
+			std::cout << "Pentru " << actor_id << "adaug " << it2->key << "\n";
+			auto found = std::find(std::begin(all_second_colleagues), std::end(all_second_colleagues), it2->key);
+			if (found == std::end(all_second_colleagues)) {
+			 	all_second_colleagues.push_back(it2->key);
+			}
     		}
     	}
     }
@@ -197,7 +217,20 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {
-    return "";
+     std::string result = "";
+     int i = 0;
+     Heap<recent_movies> copy_recent_movies = most_recent_movies;
+     while (i < k) {
+	if (copy_recent_movies.hasNodes() == true) {
+     		result = result + copy_recent_movies.extractMax().movie_id + " ";
+	}
+	++i;
+     }
+     if (result == "") {
+   	 return "none";
+     }
+     result.resize(result.size() - 1);
+     return result;
 }
 
 std::string IMDb::get_top_k_actor_pairs(int k) {
