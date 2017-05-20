@@ -14,7 +14,7 @@ class Graph {
 
  public:
   void addNode(T node) {
-    struct Node<T> n(node);
+    struct Node<T> n(node, nodes.size());
     nodes.push_back(n);
   }
 
@@ -26,9 +26,9 @@ class Graph {
       }
     }
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-      std::list<struct data<T, int>> *neighbors = nodes.getNeighbors(*it);
-      for (auto itNeighbors = neighbors.begin(); itNeighbors != neighbors.end(); ++itNeighbors) {
-        if (itNeighbors->value == node) {
+      std::list<struct data<T, int>> *neighbors = getNeighbors(it->nodeValue);
+      for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end(); ++itNeighbors) {
+        if (itNeighbors->key == node) {
           it->neighbors.erase(itNeighbors);
           break;
         }
@@ -36,27 +36,39 @@ class Graph {
     }
   }
 
-  void addEdge(T src, T dst) {
+  int getIndex(T node) {
+    for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+      if (it->nodeValue == node) {
+        return it->nodeIndex;
+      }
+    }
+    return -1;
+  }
+  
+  void addEdge(T src, T dst, int dstIndex) {
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
-    struct data<T, int> aux(dst, 0);
+    struct data<T, int> aux(dst, dstIndex, 0);
     if (neighbors != nullptr) {
       neighbors->push_back(aux);
     } 
   }
 
-  void addEdge(T src, T dst, int dist) {
+  void addEdge(T src, T dst, int dstIndex, int dist) {
     // Intre cele doua noduri va fi distanta dist.
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
-    struct data<T, int> aux(dst, dist);
-    neighbors->push_back(aux);
+    struct data<T, int> aux(dst, dstIndex, dist);
+    if (neighbors != nullptr) {
+      neighbors->push_back(aux);
+    }
   }
 
-  void increaseDistance(T src, T dst, int plus) {
+// de verificat neighbors null la segfault
+  void increaseDistance(T src, T dst, int dstIndex, int plus) {
     if (hasEdge(src, dst) == false) {
-      addEdge(src, dst, plus);
+      addEdge(src, dst, dstIndex, plus);
     } else {
       std::list<struct data<T, int>> *neighbors = getNeighbors(src);
-      for (auto itNeighbors = neighbors.begin(); itNeighbors != neighbors.end(); ++itNeighbors) { 
+      for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end(); ++itNeighbors) { 
         if (itNeighbors->key == dst) {
           itNeighbors->value = itNeighbors->value + plus;
           break;
@@ -81,7 +93,7 @@ class Graph {
     }
     struct data<T, int> *itNeighbors;
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
-    for (auto itNeighbors = neighbors.begin(); itNeighbors != neighbors.end(); ++itNeighbors) {  
+    for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end(); ++itNeighbors) {  
       if (itNeighbors->key == dst) {
         neighbors->erase(itNeighbors);
         break;
@@ -136,6 +148,12 @@ class Graph {
     }
     return false;
   }
+
+  std::list<struct Node<T>>* getNodes() {
+    return &nodes;
+  }
+
 };
 
+  
 #endif  // _HOME_STUDENT___RESOURCES___GRAPH_H_

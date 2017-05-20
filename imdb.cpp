@@ -51,10 +51,14 @@ contor++;
 		if (colleagues.hasNode(*it2) == false) {
 			colleagues.addNode(*it2);
 		}
+		int index_it = colleagues.getIndex(*it), index_it2 = colleagues.getIndex(*it2);
 		if (colleagues.hasEdge(*it, *it2) == false) {
 
-			colleagues.addEdge(*it, *it2);
-			colleagues.addEdge(*it2, *it);
+			colleagues.addEdge(*it, *it2, index_it2, 1);
+			colleagues.addEdge(*it2, *it, index_it, 1);
+		} else {
+			colleagues.increaseDistance(*it, *it2, index_it2, 1);
+			colleagues.increaseDistance(*it2, *it, index_it, 1);
 		}
 	}
     }
@@ -186,9 +190,7 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
     std::string result = "";
     std::list<struct data<std::string, int>> *first_colleagues;
     first_colleagues = colleagues.getNeighbors(actor_id);
-    if (actor_id == "5dce0979-5db2-4e9b-816d-548041e23400") {
-	for (auto it = first_colleagues->begin(); it != first_colleagues->end(); ++it) {
-}}
+  
     if (first_colleagues == nullptr) {
         return "none";
     }
@@ -197,7 +199,6 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
     	second_colleagues = colleagues.getNeighbors(it->key);
       	for (auto it2 = second_colleagues->begin(); it2 != second_colleagues->end(); ++it2) {
     		if (actor_id != it2->key && colleagues.hasEdge(actor_id, it2->key) == false) {
-			std::cout << "Pentru " << actor_id << "adaug " << it2->key << "\n";
 			auto found = std::find(std::begin(all_second_colleagues), std::end(all_second_colleagues), it2->key);
 			if (found == std::end(all_second_colleagues)) {
 			 	all_second_colleagues.push_back(it2->key);
@@ -217,32 +218,112 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {
-     std::string result = "";
-     int i = 0;
-     Heap<recent_movies> copy_recent_movies = most_recent_movies;
-     while (i < k) {
-	if (copy_recent_movies.hasNodes() == true) {
-     		result = result + copy_recent_movies.extractMax().movie_id + " ";
-	}
-	++i;
-     }
-     if (result == "") {
-   	 return "none";
-     }
-     result.resize(result.size() - 1);
-     return result;
+    std::string result = "";
+    int i = 0;
+    Heap<recent_movies> copy_recent_movies = most_recent_movies;
+    while (i < k) {
+		if (copy_recent_movies.hasNodes() == true) {
+	     		result = result + copy_recent_movies.extractMax().movie_id + " ";
+		}
+		++i;
+    }
+    if (result == "") {
+   		return "none";
+    }
+    result.resize(result.size() - 1);
+    return result;
 }
 
 std::string IMDb::get_top_k_actor_pairs(int k) {
-    return "";
+   	Heap<struct actor_pair> all_actor_pairs(100);
+   	std::list<struct Node<std::string>> *actor_nodes = colleagues.getNodes();
+   	int **actors_matrix, number_actors = actor_nodes->size();
+   	actors_matrix = new int*[number_actors];
+   	for (int i = 0 ; i < number_actors; ++i) {
+   		actors_matrix[i] = new int[number_actors];
+   		for (int j = 0; j < number_actors; ++j) {
+   			actors_matrix[i][j] = 0;
+   		}
+   	}
+   	for (auto it = actor_nodes->begin(); it != actor_nodes->end(); ++it) {
+   		std::list<struct data<std::string, int>>* neighbours;
+   		neighbours = colleagues.getNeighbors(it->nodeValue);
+   		if (neighbours != nullptr) {
+	   		for (auto it2 = neighbours->begin(); it2 != neighbours->end(); ++ it2) {
+	   			if (actors_matrix[it2->nodeIndex][it->nodeIndex] == 0) {
+	   				struct actor_pair new_actor_pair(it->nodeValue, it2->key, it2->value);
+	   				all_actor_pairs.insert(new_actor_pair);
+	   				actors_matrix[it2->nodeIndex][it->nodeIndex] = 1;
+	   				actors_matrix[it->nodeIndex][it2->nodeIndex] = 1;
+	   			}
+	   		}
+   		}
+  // 		colleagues_copy.removeEdge(it->nodeValue);
+   	}
+   	std::string result = "";
+   	int count = 0;
+   	while (count < k) {
+   		if (all_actor_pairs.hasNodes()) {
+   			result = result + all_actor_pairs.extractMax().get_info() + " ";
+
+   		}
+   		++ count;
+   	}
+   	for (int i = 0; i < number_actors; ++i) {
+   		delete[] actors_matrix[i];
+   	}
+   	delete[] actors_matrix;
+   	if (result == "") {
+   		return "none";
+   	}
+   	result.resize(result.size() - 1);
+   	return result;
 }
 
 std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
-    return "";
+    Heap<struct actor_partner> all_partners(100);
+    std::list<struct data<std::string, int>> *neighbours;
+    neighbours = colleagues.getNeighbors(actor_id);
+    if (neighbours != nullptr) {
+    	for (auto it = neighbours->begin(); it != neighbours->end(); ++ it) {
+    		struct actor_partner new_partner(it->key, it->value);
+    		all_partners.insert(new_partner);
+    	}
+    }
+    int count = 0;
+    std::string result = "";
+    while (count < k) {
+    	if (all_partners.hasNodes()) {
+    		result = result + all_partners.extractMax().actor_id + " ";
+    	}
+    	++ count;
+    }
+    if (result == "") {
+    	return "none";
+    }
+    result.resize(result.size() - 1);
+    return result;
 }
 
 std::string IMDb::get_top_k_most_popular_movies(int k) {
-    return "";
+    Heap<struct movie_popularity> popular_movies(100);
+    for (auto it = movies.begin(); it != movies.end(); ++ it) {
+    	struct movie_popularity new_popular_movie(it->first, it->second.number_ratings);
+    	popular_movies.insert(new_popular_movie);
+    }
+    int count = 0;
+    std::string result = "";
+    while (count < k) {
+    	if (popular_movies.hasNodes()) {
+    		result = result + popular_movies.extractMax().movie_id + " ";
+    	}
+    	++ count;
+    }
+    if (result == "") {
+    	return "none";
+    }
+    result.resize(result.size() - 1);
+    return result;
 }
 
 std::string IMDb::get_avg_rating_in_range(int start, int end) {

@@ -11,11 +11,13 @@ template<typename Tkey, typename Tvalue>
 struct data {
   struct data<Tkey, Tvalue> *next;
   Tvalue value;
+  int nodeIndex;
   Tkey key;
 
-  data(Tkey key, Tvalue value) {
+  data(Tkey key, int nodeIndex, Tvalue value) {
     this->value = value;
     this->key = key;
+    this->nodeIndex = nodeIndex;
     next = nullptr;
   }
 
@@ -28,6 +30,7 @@ struct data {
 
   data() {
     next = nullptr;
+    nodeIndex = -1;
     value = Tvalue();
     key = Tkey();
   }
@@ -38,10 +41,11 @@ template<typename T>
 struct Node {
   std::list<struct data<T, int>> neighbors;
   T nodeValue;
-  struct Node<T> *next;
+  int nodeIndex;
 
-  explicit Node(T nodeValue) {
+  explicit Node(T nodeValue, int nodeIndex) {
     this->nodeValue = nodeValue;
+    this->nodeIndex = nodeIndex;
   }
 
   Node() {

@@ -71,7 +71,7 @@ private:
     std::unordered_map<std::string, struct director> directors;
     std::unordered_map<std::string, std::vector<struct movie *>> categories;
     Graph<std::string> colleagues;
-//    std::vector<std::string> movie_ids; // ?
+ //   std::vector<struct movie *> movie_ids;
 //    std::vector<std::string> actor_ids; // ?
     struct director *most_influential_director;
     struct actor *longest_career_actor;

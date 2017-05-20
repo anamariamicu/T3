@@ -41,7 +41,6 @@ public:
 };
 
 
-
 template <typename T>
 Heap<T>::Heap(int capVect)
 {

@@ -1,6 +1,42 @@
 #ifndef __STRUCT_H__
 #define __STRUCT_H__
 
+struct movie_popularity {
+	std::string movie_id;
+	int number_ratings;
+
+	movie_popularity();
+	movie_popularity(std::string movie_id, int number_ratings);
+
+	friend bool operator>(const movie_popularity& X, const movie_popularity& Y);
+	friend bool operator<(const movie_popularity& X, const movie_popularity& Y);
+};
+
+struct actor_partner {
+	std::string actor_id;
+	int number_movies;
+
+	actor_partner();
+	actor_partner(std::string actor_id, int number_movies);
+
+	friend bool operator>(const actor_partner& X, const actor_partner& Y);
+	friend bool operator<(const actor_partner& X, const actor_partner& Y);
+
+};
+
+struct actor_pair {
+	std::string actor_id1;
+	std::string actor_id2;
+	int number_movies;
+
+	actor_pair();
+	actor_pair(std::string actor_id1, std::string actor_id2, int number_movies);
+	std::string get_info();
+
+	friend bool operator>(const actor_pair& X, const actor_pair& Y);
+	friend bool operator<(const actor_pair& X, const actor_pair& Y);
+};
+
 class recent_movies {
 public:
 	std::string movie_id;
