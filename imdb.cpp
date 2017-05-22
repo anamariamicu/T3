@@ -12,10 +12,35 @@
 #include "include/heap.h"
 
 
-IMDb::IMDb()
-	: most_recent_movies(100) {
+int compare_popularity(struct movie *X, struct movie *Y) {
+	if (X->number_ratings < Y->number_ratings) {
+		return -1;
+	} else if (X->number_ratings > Y->number_ratings) {
+		return 1;
+	}
+	if (X->id > Y->id) {
+		return -1;
+	} else if (X->id < Y->id) {
+		return 1;
+	}
+	return 0;
+}
+
+int compare_timestamp(struct movie *X, struct movie *Y) {
+	if (X->timestamp > Y->timestamp) {
+		return 1;
+	}
+	if (X->timestamp < Y->timestamp) {
+		return -1;
+	}
+	return 0;
+}
+
+IMDb::IMDb() :popular_movies(100, &compare_popularity), recent_movies(100, &compare_timestamp) {
 	most_influential_director = nullptr;
 	longest_career_actor = nullptr;
+	top_popularity_has_changed = false;
+	top_recent_movies_has_changed = false;
 }
 IMDb::~IMDb() {}
 
@@ -26,11 +51,10 @@ void IMDb::add_movie(std::string movie_name,
                      std::string director_name,
                      std::vector<std::string> actor_ids) {
     struct movie new_movie(movie_name, movie_id, timestamp, categories,
-                           director_name, actor_ids);
+                           director_name);
     movies.insert(std::make_pair(movie_id, new_movie));
-   // this->movie_ids.push_back(movie_id); // ?
     struct movie *movie_searched = &(movies.find(movie_id)->second);
-int contor = 0;
+	int contor = 0;
     for (auto it = actor_ids.begin(); it != actor_ids.end(); ++it) {
         	actors.find(*it)->second.add_movie(movie_searched, &longest_career_actor);
 
@@ -38,15 +62,7 @@ int contor = 0;
 	if (colleagues.hasNode(*it) == false) {
 		colleagues.addNode(*it);
 	}
-contor++;
-/*        for (auto it2 = actor_ids.begin(); it2 != actor_ids.end() && *it2 != *it; ++it2) {
-		if (colleagues.hasEdge(*it, *it2) == false) { // un if in plus?
-        		colleagues.addEdge(*it, *it2);
-		}
-		if (colleagues.hasEdge(*it2, *it) == false) {
-        		colleagues.addEdge(*it2, *it);
-		}
-        } */
+	contor++;
 	for (auto it2 = actor_ids.begin() + contor; it2 != actor_ids.end() && *it2 != *it; ++it2) {
 		if (colleagues.hasNode(*it2) == false) {
 			colleagues.addNode(*it2);
@@ -73,9 +89,8 @@ contor++;
 			category_searched->second.push_back(movie_searched);
 		}
 	}  
-	/// top k most recent movies
-	recent_movies new_recent_movie(movie_id, timestamp);
-	most_recent_movies.insert(new_recent_movie);  
+	top_popularity_has_changed = true;
+	top_recent_movies_has_changed = true;
 }
 
 void IMDb::add_user(std::string user_id, std::string name) {
@@ -86,15 +101,6 @@ void IMDb::add_user(std::string user_id, std::string name) {
 void IMDb::add_actor(std::string actor_id, std::string name) {
     struct actor new_actor(actor_id, name);
     actors.insert(std::make_pair(actor_id, new_actor));
- //   auto actor_searched = actors.find(actor_id);
-/*    if (longest_career_actor == nullptr ||
-    	(actor_searched->second.career_timestamp() > longest_career_actor->career_timestamp()) ||
-    	(actor_searched->second.career_timestamp() == longest_career_actor->career_timestamp() &&
-    		actor_searched->second.id < longest_career_actor->id)) {
-    		longest_career_actor = &(actor_searched->second);
-		std::cout << longest_career_actor->id << " acum\n";
-    }
- */
 }
 
 void IMDb::add_director(std::string name, unsigned int number_actors) {
@@ -119,11 +125,16 @@ void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
     user_searched->second.add_rating(movie_id, rating);
     auto movie_searched = movies.find(movie_id);
     movie_searched->second.add_rating(rating);
+	top_popularity_has_changed = true;
 }
 
 void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
-    remove_rating(user_id, movie_id);
-    add_rating(user_id, movie_id, rating);
+   auto user_searched = users.find(user_id);
+   auto movie_searched = movies.find(movie_id);
+   int rating_removed = user_searched->second.remove_rating(movie_id);
+   movie_searched->second.remove_rating(rating_removed);
+   user_searched->second.add_rating(movie_id, rating);
+   movie_searched->second.add_rating(rating);
 }
 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
@@ -131,6 +142,7 @@ void IMDb::remove_rating(std::string user_id, std::string movie_id) {
     int rating_removed = user_searched->second.remove_rating(movie_id);
     auto movie_searched = movies.find(movie_id);
     movie_searched->second.remove_rating(rating_removed); 
+	top_popularity_has_changed = true;
 }
 
 std::string IMDb::get_rating(std::string movie_id) {
@@ -167,21 +179,25 @@ std::string IMDb::get_best_year_for_category(std::string category) {
     		if (year_searched == years.end()) {
 	    		struct ratings new_ratings(std::stod((*it)->get_rating()));
 	    		years.insert(std::make_pair((*it)->get_year(), new_ratings));
-	    		year_searched = years.find((*it)->get_year());
 	    	} else {
 	    		year_searched->second.add_rating(std::stod((*it)->get_rating()));
     		}
-	    	if (year_searched->second.get_average_rating() > max_rating ||
-	    		(year_searched->second.get_average_rating() == max_rating &&
-	    			year_searched->first < year_max)) {
-	    			max_rating = year_searched->second.get_average_rating();
-	    			year_max = year_searched->first;
-	    	}
 		}
 	}
-    if (year_max == 0) {
+	for (auto it = movie_pointers.begin(); it != movie_pointers.end(); ++it) {
+		if ((*it)->get_rating() != "none") {
+			auto year_searched = years.find((*it)->get_year());
+			if (year_searched->second.get_average_rating() > max_rating ||
+			    		(year_searched->second.get_average_rating() == max_rating &&
+			    			year_searched->first < year_max)) {
+			    			max_rating = year_searched->second.get_average_rating();
+			    			year_max = year_searched->first;
+			}
+		}
+	}
+	if (max_rating == -1) {
     	return "none";
-    }
+	}
     return std::to_string(year_max);
 }
 
@@ -217,13 +233,21 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
     return result;
 }
 
+
 std::string IMDb::get_top_k_most_recent_movies(int k) {
+    if (top_recent_movies_has_changed == true) {
+    	recent_movies.deleteNodes();
+    	for (auto it = movies.begin(); it != movies.end(); ++ it) {
+    		recent_movies.insert(&(it->second));
+    	}
+   	top_recent_movies_has_changed = false;
+    }
     std::string result = "";
     int i = 0;
-    Heap<recent_movies> copy_recent_movies = most_recent_movies;
+    Heap<struct movie *> copy_recent_movies = recent_movies;
     while (i < k) {
 		if (copy_recent_movies.hasNodes() == true) {
-	     		result = result + copy_recent_movies.extractMax().movie_id + " ";
+	     		result = result + copy_recent_movies.extractMax()->id + " ";
 		}
 		++i;
     }
@@ -234,8 +258,27 @@ std::string IMDb::get_top_k_most_recent_movies(int k) {
     return result;
 }
 
+int compare_actor_pair(struct actor_pair X, struct actor_pair Y) {
+	if (X.number_movies > Y.number_movies) {
+		return 1;
+	} else if (X.number_movies < Y.number_movies) {
+		return -1;
+	} 
+	if (X.actor_id1 < Y.actor_id1) {
+		return 1;
+	} else if (X.actor_id1 > Y.actor_id1) {
+		return -1;
+	} 
+	if (X.actor_id2 < Y.actor_id2) {
+		return 1;
+	} else if (X.actor_id2 > Y.actor_id2) {
+		return -1;
+	}
+	return 0;
+}
+
 std::string IMDb::get_top_k_actor_pairs(int k) {
-   	Heap<struct actor_pair> all_actor_pairs(100);
+   	Heap<struct actor_pair> all_actor_pairs(100, &compare_actor_pair);
    	std::list<struct Node<std::string>> *actor_nodes = colleagues.getNodes();
    	int **actors_matrix, number_actors = actor_nodes->size();
    	actors_matrix = new int*[number_actors];
@@ -258,7 +301,6 @@ std::string IMDb::get_top_k_actor_pairs(int k) {
 	   			}
 	   		}
    		}
-  // 		colleagues_copy.removeEdge(it->nodeValue);
    	}
    	std::string result = "";
    	int count = 0;
@@ -280,21 +322,34 @@ std::string IMDb::get_top_k_actor_pairs(int k) {
    	return result;
 }
 
+int compare_partners(struct data<std::string, int> *X, struct data<std::string, int> *Y) {
+	if (X->value > Y->value) {
+		return 1;
+	} else if (X->value < Y->value) {
+		return -1;
+	}
+	if (X->key < Y->key) {
+		return 1;
+	} else if (X->key > Y->key) {
+		return -1;
+	}
+	return 0;
+}
+
 std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
-    Heap<struct actor_partner> all_partners(100);
+    Heap<struct data<std::string, int> *> all_partners(100, &compare_partners);
     std::list<struct data<std::string, int>> *neighbours;
     neighbours = colleagues.getNeighbors(actor_id);
     if (neighbours != nullptr) {
     	for (auto it = neighbours->begin(); it != neighbours->end(); ++ it) {
-    		struct actor_partner new_partner(it->key, it->value);
-    		all_partners.insert(new_partner);
+    		all_partners.insert(&(*it));
     	}
     }
     int count = 0;
     std::string result = "";
     while (count < k) {
     	if (all_partners.hasNodes()) {
-    		result = result + all_partners.extractMax().actor_id + " ";
+    		result = result + all_partners.extractMax()->key + " ";
     	}
     	++ count;
     }
@@ -305,17 +360,21 @@ std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
     return result;
 }
 
+
 std::string IMDb::get_top_k_most_popular_movies(int k) {
-    Heap<struct movie_popularity> popular_movies(100);
-    for (auto it = movies.begin(); it != movies.end(); ++ it) {
-    	struct movie_popularity new_popular_movie(it->first, it->second.number_ratings);
-    	popular_movies.insert(new_popular_movie);
+    if (top_popularity_has_changed == true) {
+    	popular_movies.deleteNodes();
+    	for (auto it = movies.begin(); it != movies.end(); ++ it) {
+    		popular_movies.insert(&(it->second));
+    	}
+   	top_popularity_has_changed = false;
     }
+    Heap<struct movie *> copy_popular_movies = popular_movies;
     int count = 0;
     std::string result = "";
     while (count < k) {
-    	if (popular_movies.hasNodes()) {
-    		result = result + popular_movies.extractMax().movie_id + " ";
+    	if (copy_popular_movies.hasNodes()) {
+    		result = result + copy_popular_movies.extractMax()->id + " ";
     	}
     	++ count;
     }
@@ -327,5 +386,24 @@ std::string IMDb::get_top_k_most_popular_movies(int k) {
 }
 
 std::string IMDb::get_avg_rating_in_range(int start, int end) {
-    return "";
+  double sum_ratings = 0;
+  int number_ratings = 0;
+    for (auto it = movies.begin(); it != movies.end(); ++it) {
+      if (it->second.timestamp >= start && it->second.timestamp <= end) {
+        double rating = it->second.get_not_rounded_rating();
+        if (rating != -1) {
+          sum_ratings += rating;
+          ++number_ratings;
+        }
+      }
+    }
+    if (number_ratings == 0) {
+      return "none";
+    }
+    double average_rating = (double) sum_ratings / number_ratings;
+  average_rating = roundf(average_rating * 100) / 100;
+  std::string average_rating_string = std::to_string(average_rating);
+  average_rating_string.resize(average_rating_string.size() - 4);
+  return average_rating_string;
 }
+

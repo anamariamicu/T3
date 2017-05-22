@@ -12,8 +12,12 @@ private:
     std::vector<T> values;
     int dimVect;
     int capVect;
+
 public:
-    Heap(int capVect);
+
+    int (*compare)(T, T);
+
+    Heap(int capVect, int (*compare) (T, T));
 
     ~Heap();
 
@@ -37,21 +41,31 @@ public:
 
     std::vector<T>& getVect();
 
+    void deleteNodes();
+
     bool hasNodes();
 };
 
 
 template <typename T>
-Heap<T>::Heap(int capVect)
+Heap<T>::Heap(int capVect, int (*compare) (T, T))
 {
     this->capVect = capVect;
     dimVect = 0;
     values.resize(capVect);
+    this->compare = compare;
 }
 
 template <typename T>
 Heap<T>::~Heap()
 {
+}
+
+template <typename T>
+void Heap<T>::deleteNodes() {
+   dimVect = 0;
+   values.resize(1);
+   capVect = 1;
 }
 
 template <typename T>
@@ -76,7 +90,7 @@ template <typename T>
 void Heap<T>::pushUp(int poz)
 {
     int parent = this->parent(poz);
-    while (poz > 0 && values[parent] < values[poz]) {
+    while (poz > 0 && compare(values[parent], values[poz]) < 0) {
       T aux = values[poz];
       values[poz] = values[parent];
       values[parent] = aux;
@@ -93,7 +107,7 @@ void Heap<T>::pushDown(int poz)
         if (leftSubtree(poz) > dimVect - 1) { // nu exista left
           break;
         } else { // exista left
-          if (values[poz] < values[leftSubtree(poz)]) {
+          if (compare(values[poz], values[leftSubtree(poz)]) < 0) {
             T aux = values[poz];
             values[poz] = values[leftSubtree(poz)];
             values[leftSubtree(poz)] = aux;
@@ -103,8 +117,8 @@ void Heap<T>::pushDown(int poz)
           }
         }
       } else { // exista si left si right
-          if (values[leftSubtree(poz)] > values[rightSubtree(poz)]) {
-            if (values[poz] < values[leftSubtree(poz)]) { // ordine
+          if (compare(values[leftSubtree(poz)], values[rightSubtree(poz)]) > 0) {
+            if (compare(values[poz], values[leftSubtree(poz)]) < 0) { // ordine
               T aux = values[poz];
               values[poz] = values[leftSubtree(poz)];
               values[leftSubtree(poz)] = aux;
@@ -113,7 +127,7 @@ void Heap<T>::pushDown(int poz)
               break; // se respecta ordinea
             }
           } else {
-            if (values[poz] < values[rightSubtree(poz)]) {
+            if (compare(values[poz], values[rightSubtree(poz)]) < 0) {
               T aux = values[poz];
               values[poz] = values[rightSubtree(poz)];
               values[rightSubtree(poz)] = aux;

@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <utility>
 
 #include "./graph.h"
 #include "./struct.h"
-#include "heap.h"
+#include "./heap.h"
 
 #define NONE                            "none"
 
@@ -71,11 +72,12 @@ private:
     std::unordered_map<std::string, struct director> directors;
     std::unordered_map<std::string, std::vector<struct movie *>> categories;
     Graph<std::string> colleagues;
- //   std::vector<struct movie *> movie_ids;
-//    std::vector<std::string> actor_ids; // ?
     struct director *most_influential_director;
     struct actor *longest_career_actor;
-    Heap<recent_movies> most_recent_movies;
+    Heap<struct movie *> popular_movies;
+    bool top_popularity_has_changed;
+    Heap<struct movie *> recent_movies;
+    bool top_recent_movies_has_changed;
 };
 
 #endif

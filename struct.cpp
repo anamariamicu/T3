@@ -8,101 +8,14 @@
 
 #include "include/struct.h"
 
-bool operator>(const movie_popularity& X, const movie_popularity& Y) {
-	if (X.number_ratings > Y.number_ratings) {
-		return true;
-	} else if (X.number_ratings < Y.number_ratings) {
-		return false;
-	}
-	if (X.movie_id < Y.movie_id) {
-		return true;
-	} else if (X.movie_id > Y.movie_id) {
-		return false;
-	}
-	return false;
-}
-
-bool operator<(const movie_popularity& X, const movie_popularity& Y) {
-	if (X.number_ratings < Y.number_ratings) {
-		return true;
-	} else if (X.number_ratings > Y.number_ratings) {
-		return false;
-	}
-	if (X.movie_id > Y.movie_id) {
-		return true;
-	} else if (X.movie_id < Y.movie_id) {
-		return false;
-	}
-	return false;
-}
-
-bool operator>(const actor_partner& X, const actor_partner& Y)
-{
-	if (X.number_movies > Y.number_movies) {
-		return true;
-	} else if (X.number_movies < Y.number_movies) {
-		return false;
-	}
-	if (X.actor_id < Y.actor_id) {
-		return true;
-	} else if (X.actor_id > Y.actor_id) {
-		return false;
-	}
-	return false;
-}
-
-bool operator<(const actor_partner& X, const actor_partner& Y) {
-	if (X.number_movies < Y.number_movies) {
-		return true;
-	} else if (X.number_movies > Y.number_movies) {
-		return false;
-	}
-	if (X.actor_id > Y.actor_id) {
-		return true;
-	} else if (X.actor_id < Y.actor_id) {
-		return false;
-	}
-	return false;
-}
-
-movie_popularity::movie_popularity() {
-	this->movie_id = "";
-	this->number_ratings = 0;
-}
-
-movie_popularity::movie_popularity(std::string movie_id, int number_ratings) {
-	this->movie_id = movie_id;
-	this->number_ratings = number_ratings;
-}
-
-actor_partner::actor_partner() {
-	this->actor_id = "";
-	this->number_movies = 0;
-}
-
-actor_partner::actor_partner(std::string actor_id, int number_movies) {
-	this->actor_id = actor_id;
-	this->number_movies = number_movies;
-}
-
-bool operator>(const recent_movies& X, const recent_movies &Y)
-{
-  return (X.timestamp > Y.timestamp);
-}
-
-bool operator<(const recent_movies& X, const recent_movies &Y)
-{
-  return (X.timestamp < Y.timestamp);
-}
 
 movie::movie(std::string name, std::string id, int timestamp, std::vector<std::string> categories,
-  	         std::string director, std::vector<std::string> actor_ids) {
+  	         std::string director) {
 	this->name = name;
 	this->id = id;
 	this->timestamp = timestamp;
 	this->director = director;
 	this->categories = categories;
-	this->actor_ids = actor_ids;
 	number_ratings = 0;
 	total_rating = 0;
 }
@@ -126,6 +39,13 @@ std::string movie::get_rating() {
 	std::string average_rating_string = std::to_string(average_rating);
 	average_rating_string.resize(average_rating_string.size() - 4);
 	return average_rating_string;
+}
+
+double movie::get_not_rounded_rating() {
+	if (number_ratings == 0) {
+		return -1;
+	}
+	return (double) total_rating / number_ratings;
 }
 
 int movie::get_year() {
@@ -203,31 +123,23 @@ ratings::ratings() {
 	total_rating = 0;
 }
 
-ratings::ratings(int rating) {
+ratings::ratings(double rating) {
 	number_ratings = 1;
 	total_rating = rating;
 }
 
-void ratings::add_rating(int rating) {
+void ratings::add_rating(double rating) {
 	++number_ratings;
 	total_rating += rating;
 }
 
 double ratings::get_average_rating() {
-	if (total_rating == 0) {
-		return 0;
+	if (number_ratings == 0) {
+		return -1;
 	}
 	return (double) total_rating / number_ratings;
 }
 
-recent_movies::recent_movies(std::string movie_id, int timestamp) {
-	this->movie_id = movie_id;
-	this->timestamp = timestamp;
-}
-recent_movies::recent_movies() {
-	this->movie_id = -1;
-	this->timestamp = -1;
-}
 
 actor_pair::actor_pair() {
 	this->actor_id1 = "";
@@ -243,43 +155,6 @@ actor_pair::actor_pair(std::string actor_id1, std::string actor_id2, int number_
 		this->actor_id2 = actor_id1;
 	}
 	this->number_movies = number_movies;
-}
-
-bool operator>(const actor_pair& X, const actor_pair& Y) {
-	if (X.number_movies > Y.number_movies) {
-		return true;
-	} else if (X.number_movies < Y.number_movies) {
-		return false;
-	} 
-	if (X.actor_id1 < Y.actor_id1) {
-		return true;
-	} else if (X.actor_id1 > Y.actor_id1) {
-		return false;
-	} 
-	if (X.actor_id2 < Y.actor_id2) {
-		return true;
-	} else if (X.actor_id2 > Y.actor_id2) {
-		return false;
-	}
-	return false;
-}
-bool operator<(const actor_pair& X, const actor_pair& Y) {
-	if (X.number_movies < Y.number_movies) {
-		return true;
-	} else if (X.number_movies > Y.number_movies) {
-		return false;
-	} 
-	if (X.actor_id1 > Y.actor_id1) {
-		return true;
-	} else if (X.actor_id1 < Y.actor_id1) {
-		return false;
-	} 
-	if (X.actor_id2 > Y.actor_id2) {
-		return true;
-	} else if (X.actor_id2 < Y.actor_id2) {
-		return false;
-	}
-	return false;
 }
 
 std::string actor_pair::get_info() {

@@ -1,28 +1,6 @@
 #ifndef __STRUCT_H__
 #define __STRUCT_H__
 
-struct movie_popularity {
-	std::string movie_id;
-	int number_ratings;
-
-	movie_popularity();
-	movie_popularity(std::string movie_id, int number_ratings);
-
-	friend bool operator>(const movie_popularity& X, const movie_popularity& Y);
-	friend bool operator<(const movie_popularity& X, const movie_popularity& Y);
-};
-
-struct actor_partner {
-	std::string actor_id;
-	int number_movies;
-
-	actor_partner();
-	actor_partner(std::string actor_id, int number_movies);
-
-	friend bool operator>(const actor_partner& X, const actor_partner& Y);
-	friend bool operator<(const actor_partner& X, const actor_partner& Y);
-
-};
 
 struct actor_pair {
 	std::string actor_id1;
@@ -37,36 +15,21 @@ struct actor_pair {
 	friend bool operator<(const actor_pair& X, const actor_pair& Y);
 };
 
-class recent_movies {
-public:
-	std::string movie_id;
-	int timestamp;
-
-	friend bool operator>(const recent_movies& X, const recent_movies &Y);
-    friend bool operator<(const recent_movies& X, const recent_movies &Y);
-
-    recent_movies();
-    recent_movies(std::string movie_id, int timestamp);
-    ~recent_movies(){
-
-    }
-};
-
 struct movie {
   std::string name;
   std::string id;
   int timestamp;
   std::string director;
-  std::vector<std::string> actor_ids; // ?
   std::vector<std::string> categories;
   int number_ratings;
   int total_rating;
 
   movie(std::string name, std::string id, int timestamp, std::vector<std::string> categories,
-  	    std::string director, std::vector<std::string> actor_ids);
+  	    std::string director);
   void add_rating(int rating);
   void remove_rating(int rating);
   std::string get_rating();
+  double get_not_rounded_rating();
   int get_year();
 };
 
@@ -101,11 +64,11 @@ struct director {
 
 struct ratings {
 	int number_ratings;
-	int total_rating;
+	double total_rating;
 
 	ratings();
-	ratings(int rating);
-	void add_rating(int rating);
+	ratings(double rating);
+	void add_rating(double rating);
 	double get_average_rating();
 };
 #endif
