@@ -66,16 +66,29 @@ public:
     std::string read_input_line(const std::string& line);
 
 private:
+
+    // Hashtable-uri nesortate pentru a retine toate fileme, toti actorii,
+    // toti utilizatorii, toti directorii si toate categoriile.
     std::unordered_map<std::string, struct movie> movies;
     std::unordered_map<std::string, struct user> users;
     std::unordered_map<std::string, struct actor> actors;
     std::unordered_map<std::string, struct director> directors;
     std::unordered_map<std::string, std::vector<struct movie *>> categories;
+
+    // Graf cu cost pentru a stabili relatiile dintre actori
     Graph<std::string> colleagues;
+
+    // Pointeri necesari unor operatii de interogare
     struct director *most_influential_director;
     struct actor *longest_career_actor;
+
+    // Heap ce stocheaza cele mai populare filme ordonate dupa numarul
+    // de rating-uri si variabila ce se schimba daca top-ul se schimba
     Heap<struct movie *> popular_movies;
     bool top_popularity_has_changed;
+
+    // Heap ce stocheaza cele mai recente filme ordonate dupa timestamp
+    // si variabila ce se schimba daca top-ul de schimba
     Heap<struct movie *> recent_movies;
     bool top_recent_movies_has_changed;
 };

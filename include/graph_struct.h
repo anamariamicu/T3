@@ -3,10 +3,8 @@
 #ifndef __GRAPH_STRUCT_H__
 #define __GRAPH_STRUCT_H__
 
-#include <string>
-
-using std::string;
-
+// Structura utilizata pentru a salva vecinul unui nod impreuna cu
+// costul dintre cele doua noduri
 template<typename Tkey, typename Tvalue>
 struct data {
   struct data<Tkey, Tvalue> *next;
@@ -36,7 +34,7 @@ struct data {
   }
 };
 
-
+// Structura ce defineste un nod al grafului
 template<typename T>
 struct Node {
   std::list<struct data<T, int>> neighbors;

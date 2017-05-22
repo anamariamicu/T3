@@ -1,7 +1,6 @@
 #ifndef __STRUCT_H__
 #define __STRUCT_H__
 
-
 struct actor_pair {
 	std::string actor_id1;
 	std::string actor_id2;
