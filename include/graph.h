@@ -1,6 +1,6 @@
 // Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
-#ifndef __GRAPH__H  // _HOME_STUDENT_RESOURCES_GRAPH_H_
-#define __GRAPH__H
+#ifndef __GRAPH__H  // _HOME_STUDENT_RESOURCES_INCLUDE_GRAPH_H_
+#define __GRAPH__H  // _HOME_STUDENT_RESOURCES_INCLUDE_GRAPH_H_
 
 #include <list>
 #include "./graph_struct.h"
@@ -171,4 +171,4 @@ template <typename T> class Graph {
   std::list<struct Node<T>> *getNodes() { return &nodes; }
 };
 
-#endif  // _HOME_STUDENT_RESOURCES_GRAPH_H_
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_GRAPH_H_

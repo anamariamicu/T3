@@ -1,6 +1,6 @@
 // Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
-#ifndef __GRAPH_STRUCT_H__  // _HOME_STUDENT_RESOURCES_GRAPH_STRUCT_H_
-#define __GRAPH_STRUCT_H__
+#ifndef __GRAPH_STRUCT_H__  // _HOME_STUDENT_RESOURCES_INCLUDE_GRAPH_STRUCT_H_
+#define __GRAPH_STRUCT_H__  // _HOME_STUDENT_RESOURCES_INCLUDE_GRAPH_STRUCT_H_
 
 #include <list>
 
@@ -19,7 +19,7 @@ template <typename Tkey, typename Tvalue> struct data {
     next = nullptr;
   }
 
-  bool operator==(struct data &el) {
+  bool operator==(const struct data &el) {
     if (this->key == el.key) {
       return true;
     }
@@ -48,4 +48,4 @@ template <typename T> struct Node {
   Node() { nodeValue = T(); }
 };
 
-#endif  // _HOME_STUDENT_RESOURCES_GRAPH_STRUCT_H_
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_GRAPH_STRUCT_H_

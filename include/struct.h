@@ -1,6 +1,6 @@
 // Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
-#ifndef __STRUCT_H__  // _HOME_STUDENT_RESOURCES_STRUCT_H_
-#define __STRUCT_H__
+#ifndef __STRUCT_H__  // _HOME_STUDENT_RESOURCES_INCLUDE_STRUCT_H_
+#define __STRUCT_H__  // _HOME_STUDENT_RESOURCES_INCLUDE_STRUCT_H_
 
 #include <unordered_map>
 #include <string>
@@ -75,4 +75,4 @@ struct ratings {
   void add_rating(double rating);
   double get_average_rating();
 };
-#endif  // _HOME_STUDENT_RESOURCES_STRUCT_H_
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_STRUCT_H_

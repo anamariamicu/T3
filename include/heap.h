@@ -1,6 +1,7 @@
 // Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
-#ifndef MAX_HEAP_H  // _HOME_STUDENT_RESOURCES_HEAP_H_
-#define MAX_HEAP_H
+#ifndef MAX_HEAP_H  // _HOME_STUDENT_RESOURCES_INCLUDE_HEAP_H_
+#define MAX_HEAP_H  // _HOME_STUDENT_RESOURCES_INCLUDE_HEAP_H_
+
 
 #include <iostream>
 #include <cstring>
@@ -166,4 +167,5 @@ template <typename T> bool Heap<T>::hasNodes() {
   return true;
 }
 
-#endif  // _HOME_STUDENT_RESOURCES_HEAP_H_
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_HEAP_H_
+

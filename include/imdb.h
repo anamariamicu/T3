@@ -1,6 +1,6 @@
 // Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
-#ifndef __IMDB__H__  // _HOME_STUDENT_RESOURCES_IMDB_H_
-#define __IMDB__H__
+#ifndef __IMDB__H__  // _HOME_STUDENT_RESOURCES_INCLUDE_IMDB_H_
+#define __IMDB__H__  // _HOME_STUDENT_RESOURCES_INCLUDE_IMDB_H_
 
 #include <string>
 #include <vector>
@@ -91,4 +91,4 @@ class IMDb {
   bool top_recent_movies_has_changed;
 };
 
-#endif  // _HOME_STUDENT_RESOURCES_IMDB_H_
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_IMDB_H_
