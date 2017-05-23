@@ -1,15 +1,12 @@
-// Copyright 2017 Micu Ana-Maria, 311CA
-
-#ifndef __GRAPH__H
+// Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
+#ifndef __GRAPH__H  // _HOME_STUDENT_RESOURCES_GRAPH_H_
 #define __GRAPH__H
 
 #include <list>
 #include "./graph_struct.h"
 
-template <typename T>
-class Graph {
+template <typename T> class Graph {
  private:
-
   // Implementare cu liste de vecini a grafului cu cost
   std::list<struct Node<T>> nodes;
 
@@ -20,7 +17,6 @@ class Graph {
   }
 
   void removeNode(T node) {
-
     // Stergerea din lista de noduri
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
       if (it->nodeValue == node) {
@@ -32,7 +28,8 @@ class Graph {
     // Stergerea din lista de vecini a celorlalte noduri
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
       std::list<struct data<T, int>> *neighbors = getNeighbors(it->nodeValue);
-      for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end(); ++itNeighbors) {
+      for (auto itNeighbors = neighbors->begin();
+           itNeighbors != neighbors->end(); ++itNeighbors) {
         if (itNeighbors->key == node) {
           it->neighbors.erase(itNeighbors);
           break;
@@ -41,7 +38,7 @@ class Graph {
     }
   }
 
-  // Returnarea indexului nodului atribuit pentru a fi identificat mai usor  
+  // Returnarea indexului nodului atribuit pentru a fi identificat mai usor
   int getIndex(T node) {
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
       if (it->nodeValue == node) {
@@ -57,12 +54,11 @@ class Graph {
     struct data<T, int> aux(dst, dstIndex, 0);
     if (neighbors != nullptr) {
       neighbors->push_back(aux);
-    } 
+    }
   }
 
   // Adugarea unei muchii cu cost
   void addEdge(T src, T dst, int dstIndex, int dist) {
-
     // Intre cele doua noduri va fi distanta dist.
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
     struct data<T, int> aux(dst, dstIndex, dist);
@@ -77,7 +73,8 @@ class Graph {
       addEdge(src, dst, dstIndex, plus);
     } else {
       std::list<struct data<T, int>> *neighbors = getNeighbors(src);
-      for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end(); ++itNeighbors) { 
+      for (auto itNeighbors = neighbors->begin();
+           itNeighbors != neighbors->end(); ++itNeighbors) {
         if (itNeighbors->key == dst) {
           itNeighbors->value = itNeighbors->value + plus;
           break;
@@ -89,7 +86,8 @@ class Graph {
   // Returneaza costul dintre doua noduri
   int distance(T src, T dst) {
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
-    for (auto itNeighbors = neighbors.begin(); itNeighbors != neighbors.end(); ++itNeighbors) { 
+    for (auto itNeighbors = neighbors.begin(); itNeighbors != neighbors.end();
+         ++itNeighbors) {
       if (itNeighbors->key == dst) {
         return itNeighbors->value;
       }
@@ -106,7 +104,8 @@ class Graph {
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
 
     // Eliminarea din lista de vecini
-    for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end(); ++itNeighbors) {  
+    for (auto itNeighbors = neighbors->begin(); itNeighbors != neighbors->end();
+         ++itNeighbors) {
       if (itNeighbors->key == dst) {
         neighbors->erase(itNeighbors);
         break;
@@ -117,7 +116,6 @@ class Graph {
   // Stergerea tuturor muchiilor
   void removeAllEdges() {
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-   
       // Se elimina lista de vecini.
       std::list<struct data<T, int>> *neighbors = getNeighbors(it->nodeValue);
       neighbors->removeAll();
@@ -128,7 +126,7 @@ class Graph {
   bool hasEdge(T src, T dst) {
     std::list<struct data<T, int>> *neighbors = getNeighbors(src);
     if (neighbors == nullptr) {
-        return false;
+      return false;
     }
     for (auto it = neighbors->begin(); it != neighbors->end(); ++it) {
       if (it->key == dst) {
@@ -139,7 +137,7 @@ class Graph {
   }
 
   // Returneaza lista de vecini a unui nod
-  std::list<struct data<T, int>>* getNeighbors(T node) {
+  std::list<struct data<T, int>> *getNeighbors(T node) {
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
       if (it->nodeValue == node) {
         return &(it->neighbors);
@@ -149,7 +147,8 @@ class Graph {
   }
 
   // Verifica daca un nod are cel putin o muchie, deci cel putin un vecin
-  bool hasEdges() {
+  bool
+  hasEdges() {
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
       if (getNeighbors(it->nodeValue)->isEmpty() == false) {
         return true;
@@ -169,11 +168,7 @@ class Graph {
   }
 
   // Returneaza lista de noduri din graf
-  std::list<struct Node<T>>* getNodes() {
-    return &nodes;
-  }
-
+  std::list<struct Node<T>> *getNodes() { return &nodes; }
 };
 
-  
-#endif  // _HOME_STUDENT___RESOURCES___GRAPH_H_
+#endif  // _HOME_STUDENT_RESOURCES_GRAPH_H_

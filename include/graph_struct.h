@@ -1,12 +1,12 @@
-// Copyright 2017 Micu Ana-Maria, 311CA
-
-#ifndef __GRAPH_STRUCT_H__
+// Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
+#ifndef __GRAPH_STRUCT_H__  // _HOME_STUDENT_RESOURCES_GRAPH_STRUCT_H_
 #define __GRAPH_STRUCT_H__
+
+#include <list>
 
 // Structura utilizata pentru a salva vecinul unui nod impreuna cu
 // costul dintre cele doua noduri
-template<typename Tkey, typename Tvalue>
-struct data {
+template <typename Tkey, typename Tvalue> struct data {
   struct data<Tkey, Tvalue> *next;
   Tvalue value;
   int nodeIndex;
@@ -19,7 +19,7 @@ struct data {
     next = nullptr;
   }
 
-  bool operator==(struct data& el) {
+  bool operator==(struct data &el) {
     if (this->key == el.key) {
       return true;
     }
@@ -35,8 +35,7 @@ struct data {
 };
 
 // Structura ce defineste un nod al grafului
-template<typename T>
-struct Node {
+template <typename T> struct Node {
   std::list<struct data<T, int>> neighbors;
   T nodeValue;
   int nodeIndex;
@@ -46,9 +45,7 @@ struct Node {
     this->nodeIndex = nodeIndex;
   }
 
-  Node() {
-    nodeValue = T();
-  }
+  Node() { nodeValue = T(); }
 };
 
-#endif
+#endif  // _HOME_STUDENT_RESOURCES_GRAPH_STRUCT_H_

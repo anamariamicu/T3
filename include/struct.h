@@ -1,17 +1,22 @@
-#ifndef __STRUCT_H__
+// Copyright 2017 Bukkosi George - Daniel, Micu Ana - Maria
+#ifndef __STRUCT_H__  // _HOME_STUDENT_RESOURCES_STRUCT_H_
 #define __STRUCT_H__
 
+#include <unordered_map>
+#include <string>
+#include <vector>
+
 struct actor_pair {
-	std::string actor_id1;
-	std::string actor_id2;
-	int number_movies;
+  std::string actor_id1;
+  std::string actor_id2;
+  int number_movies;
 
-	actor_pair();
-	actor_pair(std::string actor_id1, std::string actor_id2, int number_movies);
-	std::string get_info();
+  actor_pair();
+  actor_pair(std::string actor_id1, std::string actor_id2, int number_movies);
+  std::string get_info();
 
-	friend bool operator>(const actor_pair& X, const actor_pair& Y);
-	friend bool operator<(const actor_pair& X, const actor_pair& Y);
+  friend bool operator>(const actor_pair &X, const actor_pair &Y);
+  friend bool operator<(const actor_pair &X, const actor_pair &Y);
 };
 
 struct movie {
@@ -23,8 +28,8 @@ struct movie {
   int number_ratings;
   int total_rating;
 
-  movie(std::string name, std::string id, int timestamp, std::vector<std::string> categories,
-  	    std::string director);
+  movie(std::string name, std::string id, int timestamp,
+        std::vector<std::string> categories, std::string director);
   void add_rating(int rating);
   void remove_rating(int rating);
   std::string get_rating();
@@ -49,25 +54,25 @@ struct actor {
   struct movie *last_movie;
 
   actor(std::string name, std::string id);
-  actor(std::string id);
-  void add_movie(struct movie*, struct actor**);
+  explicit actor(std::string id);
+  void add_movie(struct movie *, struct actor **);
   int career_timestamp();
 };
 
 struct director {
-	std::string name;
-	unsigned int number_actors;
+  std::string name;
+  unsigned int number_actors;
 
-	director(std::string name, unsigned int number_actors);
+  director(std::string name, unsigned int number_actors);
 };
 
 struct ratings {
-	int number_ratings;
-	double total_rating;
+  int number_ratings;
+  double total_rating;
 
-	ratings();
-	ratings(double rating);
-	void add_rating(double rating);
-	double get_average_rating();
+  ratings();
+  explicit ratings(double rating);
+  void add_rating(double rating);
+  double get_average_rating();
 };
-#endif
+#endif  // _HOME_STUDENT_RESOURCES_STRUCT_H_

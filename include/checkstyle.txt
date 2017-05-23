@@ -1,0 +1,2 @@
+Done processing ./struct.h
+Total errors found: 0
